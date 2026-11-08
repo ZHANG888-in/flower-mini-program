@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>视觉灵感 · 花艺定制 — 低保真交互原型</title>
+<style>
+  :root{
+    --paper:#EDE9E1;          /* 手机外背景 */
+    --screen:#F8F6F1;         /* 手机屏背景 */
+    --ink:#3A3632;            /* 主文字 */
+    --ink2:#8A8379;           /* 次文字 */
+    --ink3:#B4ACA0;           /* 弱文字 */
+    --line:#D9D2C6;           /* 描边 */
+    --box:#E7E1D6;            /* 图片占位底 */
+    --box2:#DAD3C6;           /* 图片占位斜纹 */
+    --accent:#C79A7C;         /* 品牌色（仅用于选中态） */
+    --serif:"Songti SC","Noto Serif SC","STSong",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.55;font-size:14px}
+  button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer;text-align:left}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-thumb{background:#C9C1B4;border-radius:3px}
+
+  /* ===== 顶部头 ===== */
+  .tophead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);background:#F7F4EE;position:sticky;top:0;z-index:50}
+  .th-t{font-family:var(--serif);font-size:17px;font-weight:500}
+  .th-sub{font-family:var(--sans);font-size:12px;color:var(--ink2);font-weight:400;margin-left:8px}
+  .th-btn{font-size:13px;padding:7px 14px;border:1px solid var(--line);border-radius:99px;background:#fff}
+  .th-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ===== 布局 ===== */
+  .layout{display:flex;align-items:flex-start}
+  .sidebar{width:268px;flex-shrink:0;background:#FBF9F4;border-right:1px solid var(--line);height:100vh;position:sticky;top:0;overflow-y:auto;padding:18px 14px 30px}
+  .side-t{font-size:13px;font-weight:600;padding:0 8px 10px;color:var(--ink2)}
+  .sm-group{margin-bottom:6px}
+  .sm-gt{font-size:11px;letter-spacing:.08em;color:var(--ink3);padding:12px 8px 4px;text-transform:uppercase}
+  .sm-item{display:block;width:100%;font-size:13px;padding:7px 10px;border-radius:8px;color:var(--ink)}
+  .sm-item:hover{background:#F0EBE2}
+  .sm-item.cur{background:rgba(199,154,124,.16);color:var(--accent);font-weight:600}
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;padding:26px 16px 60px;gap:12px}
+  .stage-hint{font-size:12px;color:var(--ink2)}
+
+  /* ===== 手机 ===== */
+  .phone{width:375px;background:var(--screen);border-radius:42px;box-shadow:0 24px 70px rgba(58,54,50,.22);overflow:hidden;border:7px solid #2E2A26;flex-shrink:0}
+  .screen{height:752px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;background:var(--screen)}
+
+  .status{display:flex;justify-content:space-between;padding:9px 20px 4px;font-size:12px;font-weight:600;color:var(--ink);flex-shrink:0}
+  .status .dots{letter-spacing:1px}
+
+  .topbar{display:flex;align-items:center;gap:8px;padding:6px 14px 10px;flex-shrink:0}
+  .topbar .brand{font-family:var(--serif);font-size:17px;font-weight:500;flex:1}
+  .topbar .ttl{flex:1;font-size:15px;font-weight:600;text-align:center}
+  .topbar .nb,.topbar .nb-r{width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:18px;border-radius:50%;color:var(--ink)}
+  .topbar .nb{font-size:24px;line-height:1}
+  .topbar .nb-r{font-size:15px}
+  .search{flex:1;height:32px;border-radius:99px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;padding:0 12px;color:var(--ink3);font-size:12px}
+
+  .body{flex:1;padding:2px 18px 20px}
+
+  /* 通用区块 */
+  .sec{display:flex;align-items:baseline;justify-content:space-between;margin:20px 0 10px}
+  .sec-t{font-family:var(--serif);font-size:16px;font-weight:500}
+  .sec-m{font-size:12px;color:var(--ink2)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .links{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+
+  /* 图片占位 */
+  .img{background:repeating-linear-gradient(45deg,transparent 0 9px,rgba(138,131,121,.10) 9px 10px),linear-gradient(var(--box),var(--box2));border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#9F968A;font-size:11px;letter-spacing:.04em;text-align:center}
+  .img span{opacity:.9}
+  .r1{aspect-ratio:1/1}
+  .r45{aspect-ratio:4/5}
+  .r169{aspect-ratio:16/9}
+  .r21{aspect-ratio:2/1}
+  .r-wide{aspect-ratio:3/2}
+
+  /* 按钮 */
+  .btn{display:flex;align-items:center;justify-content:center;height:44px;padding:0 20px;border-radius:99px;background:var(--ink);color:#fff;font-size:15px;font-weight:600}
+  .btn.obtn{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+  .btn.sm{height:34px;font-size:13px;padding:0 16px}
+  .btn.grow{flex:1}
+
+  /* chips */
+  .chiprow{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{height:30px;padding:0 14px;border-radius:99px;font-size:12px;border:1px solid var(--line);background:#fff;color:var(--ink2);white-space:nowrap}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+  /* 场景 */
+  .scenerow{display:flex;justify-content:space-between;gap:6px}
+  .scene{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+  .sc-ic{width:50px;height:50px;border-radius:50%;background:repeating-linear-gradient(45deg,transparent 0 7px,rgba(138,131,121,.10) 7px 8px),var(--box);border:1px solid var(--line)}
+
+  /* 商品卡 */
+  .pcard{display:flex;flex-direction:column;gap:6px;width:100%}
+  .pcard .img{width:100%}
+  .pc-nm{font-size:13px;font-weight:600}
+  .pc-tg{font-size:10px;color:var(--ink2);align-self:flex-start;border:1px solid var(--line);border-radius:99px;padding:1px 8px}
+  .pc-pr{font-size:15px;font-weight:600}
+
+  /* 灵感卡 */
+  .icard{display:flex;flex-direction:column;gap:6px;width:100%}
+  .icard .img{width:100%}
+  .ic-nm{font-size:12px;font-weight:600}
+  .ic-tg{font-size:10px;color:var(--ink2)}
+
+  /* 专题 */
+  .topic{display:flex;flex-direction:column;gap:6px;width:100%;margin-bottom:10px}
+  .topic .img{width:100%}
+  .tp-nm{font-size:12px;font-weight:600}
+
+  /* banner */
+  .banner{position:relative;margin-bottom:6px}
+  .banner .img{width:100%}
+  .bn-ov{position:absolute;left:0;right:0;bottom:0;padding:14px;color:#fff;background:linear-gradient(transparent,rgba(40,36,32,.55));border-radius:0 0 12px 12px;display:flex;flex-direction:column;gap:2px}
+  .bn-ov b{font-family:var(--serif);font-size:15px;font-weight:500}
+  .bn-ov span{font-size:11px;opacity:.9}
+
+  /* 列表行 */
+  .link{display:flex;align-items:center;width:100%;padding:13px 14px;border-bottom:1px solid var(--line);background:#fff;font-size:14px}
+  .link:last-child{border-bottom:none}
+  .lk-t{flex:1}
+  .lk-s{font-size:12px;color:var(--ink2);margin-right:8px}
+  .lk-a{color:var(--ink3);font-size:16px}
+
+  /* 字段 */
+  .field{display:flex;justify-content:space-between;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);background:#fff;font-size:13px}
+  .field:last-child{border-bottom:none}
+  .fd-l{color:var(--ink2);flex-shrink:0}
+  .fd-v{text-align:right}
+
+  /* 色块 */
+  .sw{display:inline-flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--ink2)}
+  .sw-c{width:36px;height:36px;border-radius:10px;border:1px solid var(--line)}
+
+  /* 步骤 */
+  .steps{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:11px;color:var(--ink3);padding:2px 0}
+  .steps .st{white-space:nowrap}
+  .steps .st.cur{color:var(--ink);font-weight:700}
+  .steps .st.done{color:var(--ink2)}
+  .steps .st-arrow{color:var(--ink3)}
+
+  /* 标签 */
+  .tag{font-size:10px;color:var(--ink2);border:1px solid var(--line);border-radius:99px;padding:1px 8px;display:inline-block}
+
+  /* 底部 Tab */
+  .tabbar{display:flex;border-top:1px solid var(--line);background:#fff;position:sticky;bottom:0;flex-shrink:0}
+  .tabbar .t{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0 9px;font-size:10px;color:var(--ink2)}
+  .tabbar .tic{width:20px;height:20px;border-radius:6px;background:var(--box2);border:1px solid var(--line)}
+  .tabbar .t.on{color:var(--accent);font-weight:600}
+  .tabbar .t.on .tic{background:var(--accent);border-color:var(--accent)}
+
+  /* 底部操作栏 */
+  .actbar{display:flex;gap:10px;padding:12px 18px;border-top:1px solid var(--line);background:#fff;position:sticky;bottom:0;flex-shrink:0;align-items:center}
+
+  /* 其他 */
+  .note{font-size:11px;color:var(--ink3);background:#F0EBE2;border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin:10px 0}
+  .suc{display:flex;flex-direction:column;align-items:center;gap:10px;padding:50px 20px;text-align:center}
+  .suc .ck{width:60px;height:60px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px}
+  .suc b{font-family:var(--serif);font-size:17px}
+  .suc span{font-size:12px;color:var(--ink2)}
+
+  .muted{color:var(--ink2);font-size:12px}
+  .h3{font-size:13px;font-weight:600;margin:14px 0 8px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}
+
+  /* 手机端：隐藏侧栏、手机全宽 */
+  @media (max-width:820px){
+    .sidebar{position:fixed;left:-280px;top:0;z-index:100;transition:left .2s;box-shadow:0 0 40px rgba(0,0,0,.2)}
+    .sidebar.open{left:0}
+    .phone{width:100%;max-width:375px}
+    .screen{height:76vh;min-height:560px}
+  }
+</style>
+</head>
+<body>
+
+<div class="tophead">
+  <div class="th-t">视觉灵感 · 花艺定制<span class="th-sub">低保真交互原型 · 5 Tab · 全页面可点击</span></div>
+  <div class="th-actions">
+    <button class="th-btn" onclick="toggleMap()">页面地图</button>
+    <button class="th-btn" onclick="tab('home')">回首页</button>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-t">📋 页面地图（点任意页面跳转）</div>
+    <div id="sitemap"></div>
+  </aside>
+
+  <div class="stage">
+    <div class="stage-hint">↓ 点击手机里的元素即可跳转页面；灰色斜纹 = 图片占位</div>
+    <div class="phone">
+      <div class="screen" id="screen"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 工具函数 ================= */
+function statusBar(){ return `<div class="status"><span>9:41</span><span class="dots">●●●</span></div>`; }
+
+function navBar(title, opt){
+  opt = opt || {};
+  var left = (opt.back === false)
+    ? `<span class="brand">花语 · FLORA</span>`
+    : `<button class="nb" onclick="back()">‹</button>`;
+  var right = opt.right ? `<span class="nb-r">${opt.right}</span>` : `<span class="nb-r"></span>`;
+  return `<div class="topbar">${left}<span class="ttl">${title||''}</span>${right}</div>`;
+}
+
+function search(ph){ return `<button class="search" onclick="go('shop')">${ph||'搜索花束 / 灵感'}</button>`; }
+
+function sec(title, more){
+  return `<div class="sec"><span class="sec-t">${title}</span>${more?`<button class="sec-m" onclick="${more}">查看全部 ›</button>`:''}</div>`;
+}
+
+function btn(label, onclick, cls){ return `<button class="btn ${cls||''}" onclick="${onclick}">${label}</button>`; }
+function obtn(label, onclick){ return `<button class="btn obtn ${arguments[2]||''}" onclick="${onclick}">${label}</button>`; }
+
+function chip(label, on){ return `<button class="chip ${on?'on':''}" onclick="this.classList.toggle('on')">${label}</button>`; }
+
+function img(label, r, h){
+  var st = h ? `style="height:${h}px"` : '';
+  return `<div class="img ${r||''}" ${st}><span>▦ ${label||'图片'}</span></div>`;
+}
+
+function scene(name, onclick){
+  return `<button class="scene" onclick="${onclick}"><span class="sc-ic"></span><span>${name}</span></button>`;
+}
+
+function pcard(name, price, tg, target){
+  return `<button class="pcard" onclick="go('${target}')">
+    ${img(tg||'花束','r45','')}<span class="pc-nm">${name}</span><span class="pc-tg">${tg}</span><span class="pc-pr">${price}</span>
+  </button>`;
+}
+
+function icard(title, type, target){
+  return `<button class="icard" onclick="go('${target}')">
+    ${img(type==='专辑'?'专辑封面':'灵感图','r1','')}<span class="ic-nm">${title}</span><span class="ic-tg">${type}</span>
+  </button>`;
+}
+
+function topicCard(title, onclick){
+  return `<button class="topic" onclick="${onclick}">${img(title,'r169',90)}<span class="tp-nm">${title}</span></button>`;
+}
+
+function link(label, sub, onclick){
+  return `<button class="link" onclick="${onclick}"><span class="lk-t">${label}</span>${sub?`<span class="lk-s">${sub}</span>`:''}<span class="lk-a">›</span></button>`;
+}
+
+function field(label, val){ return `<div class="field"><span class="fd-l">${label}</span><span class="fd-v">${val||'—'}</span></div>`; }
+function swatch(name, hex){ return `<span class="sw"><span class="sw-c" style="background:${hex}"></span><span class="sw-n">${name}</span></span>`; }
+function tag(t){ return `<span class="tag">${t}</span>`; }
+
+function tabbar(active){
+  var tabs = [['home','首页'],['shop','选花'],['inspiration','灵感'],['cart','购物车'],['profile','我的']];
+  return `<div class="tabbar">${tabs.map(function(t){ return `<button class="t ${t[0]===active?'on':''}" onclick="tab('${t[0]}')"><span class="tic"></span>${t[1]}</button>`; }).join('')}</div>`;
+}
+function actionbar(html){ return `<div class="actbar">${html}</div>`; }
+
+function steps(arr, cur){
+  return `<div class="steps">${arr.map(function(s,i){
+    return `<span class="st ${i<cur?'done':i===cur?'cur':''}">${i+1} ${s}</span>${i<arr.length-1?'<span class="st-arrow">›</span>':''}`;
+  }).join('')}</div>`;
+}
+
+/* ================= 屏幕定义 ================= */
+var SCREENS = {
+
+  /* ---------- 首页 ---------- */
+  home: function(){
+    return statusBar() +
+    `<div class="topbar"><span class="brand">花语 · FLORA</span>` + search('搜索花束 / 灵感') + `</div>` +
+    `<div class="body">
+      <div class="banner" onclick="go('topic')">
+        ${img('品牌主视觉 · 当季主题','r21',132)}
+        <div class="bn-ov"><b>当季主题 · 初夏花园</b><span>视觉主题快捷入口 ›</span></div>
+      </div>
+      ${sec('场景选花')}
+      <div class="scenerow">
+        ${scene('生日祝福',"go('scene-list')")}
+        ${scene('纪念日',"go('scene-list')")}
+        ${scene('爱情表达',"go('scene-list')")}
+        ${scene('日常赠礼',"go('scene-list')")}
+        ${scene('自我悦己',"go('scene-list')")}
+      </div>
+      ${sec('精选商品',"go('shop')")}
+      <div class="grid2">
+        ${pcard('温柔纪事','¥299','纪念日','product-detail')}
+        ${pcard('怦然心动','¥199','爱情','product-detail')}
+      </div>
+      ${sec('灵感精选')}
+      <div class="grid2">
+        ${icard('专辑 · 温柔纪事','专辑','inspiration-album')}
+        ${icard('复古蓝调','色彩','inspiration-color')}
+        ${icard('自然 · 野趣','风格','inspiration-style')}
+        ${icard('花艺师 · 仲夏','花艺','inspiration-works')}
+      </div>
+      ${sec('主题专题')}
+      ${topicCard('本月花色研究所',"go('topic')")}
+      ${topicCard('季节花专题 · 夏日限定',"go('topic')")}
+      ${sec('品牌与服务')}
+      <div class="links">
+        ${link('品牌理念','',"go('brand')")}
+        ${link('花艺师介绍','',"go('brand')")}
+        ${link('定制服务介绍','',"go('brand')")}
+        ${link('服务流程','',"go('brand')")}
+      </div>
+    </div>` + tabbar('home');
+  },
+
+  /* ---------- 选花 ---------- */
+  shop: function(){
+    return statusBar() + navBar('选花', {back:false}) +
+    `<div class="body">
+      ${search('搜索花束 / 花材')}
+      ${sec('商品分类')}
+      <div class="grid2">
+        ${icard('单支花材','花材','shop-list')}
+        ${icard('花盒 / 花篮','花盒','shop-list')}
+        ${icard('永生花 / 干花','永生','shop-list')}
+        ${icard('花器 / 花艺配件','花器','shop-list')}
+      </div>
+      ${sec('场景分类')}
+      <div class="chiprow">
+        ${chip('生日')}${chip('爱情')}${chip('纪念日')}${chip('节日')}${chip('日常')}${chip('悦己')}
+      </div>
+      ${sec('商品筛选')}
+      <div class="h3">色彩</div><div class="chiprow">${chip('红')}${chip('粉')}${chip('白')}${chip('紫')}${chip('黄')}</div>
+      <div class="h3">风格</div><div class="chiprow">${chip('复古')}${chip('自然')}${chip('浪漫')}${chip('简约')}</div>
+      <div class="h3">花材</div><div class="chiprow">${chip('玫瑰')}${chip('郁金香')}${chip('洋桔梗')}</div>
+      <div class="h3">价格区间</div><div class="chiprow">${chip('< ¥200')}${chip('¥200–400')}${chip('¥400+')}</div>
+      <div class="h3">尺寸</div><div class="chiprow">${chip('S')}${chip('M')}${chip('L')}</div>
+      ${sec('商品列表',"go('shop-list')")}
+      <div class="grid2">
+        ${pcard('温柔纪事','¥299','纪念日','product-detail')}
+        ${pcard('怦然心动','¥199','爱情','product-detail')}
+      </div>
+      <div class="note">想自己搭一束？进入花艺定制：选材 → 花艺师制作 → 3D 预览确认</div>
+    </div>` + actionbar(btn('去花艺定制 →',"go('customize')",'grow')) + tabbar('shop');
+  },
+
+  'shop-list': function(){
+    return statusBar() + navBar('花束 · 生日') +
+    `<div class="body">
+      <div class="chiprow">
+        ${chip('综合排序',1)}${chip('价格')}${chip('色彩')}${chip('花材')}${chip('尺寸')}
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        ${pcard('温柔纪事','¥299','纪念日','product-detail')}
+        ${pcard('怦然心动','¥199','爱情','product-detail')}
+        ${pcard('晨雾花园','¥359','生日','product-detail')}
+        ${pcard('暖阳','¥259','日常','product-detail')}
+        ${pcard('蓝调时刻','¥329','爱情','product-detail')}
+        ${pcard('野趣','¥279','悦己','product-detail')}
+      </div>
+    </div>` + tabbar('shop');
+  },
+
+  'product-detail': function(){
+    return statusBar() + navBar('商品详情') +
+    `<div class="body">
+      ${img('商品主视觉 · 花束','r45')}
+      <div class="h3" style="font-family:var(--serif);font-size:18px">温柔纪事 <span class="muted" style="font-weight:400">¥299</span></div>
+      <div class="chiprow">${tag('纪念日')} ${tag('浪漫')} ${tag('粉·白')}</div>
+      ${sec('商品介绍')}
+      <p class="muted">为纪念日设计的一束花，粉白相间，柔和而克制，适合送给重要的人。</p>
+      ${sec('花材组成（Shop the look）')}
+      <div class="chiprow">${chip('玫瑰')}${chip('洋牡丹')}${chip('尤加利')}</div>
+      ${sec('色彩与风格')}
+      <div>${swatch('复古蓝','#93A3AE')} ${swatch('银灰','#C9C2B6')} ${swatch('暖白','#F2EDE4')}</div>
+      ${sec('尺寸与规格')}
+      <div class="chiprow">${chip('S ¥199')}${chip('M ¥299',1)}${chip('L ¥399')}</div>
+      ${sec('价格明细')}
+      <div class="links">
+        ${field('花束（M）','¥299')}
+        ${field('配送费','¥0（免配送）')}
+        ${field('合计','¥299')}
+      </div>
+      ${sec('相关灵感推荐')}
+      <div class="grid2">
+        ${icard('复古蓝调','色彩','inspiration-detail')}
+        ${icard('浪漫粉调','色彩','inspiration-detail')}
+      </div>
+    </div>` + actionbar(obtn('收藏','','sm') + btn('加入购物车',"go('cart')",'obtn grow') + btn('立即定制',"go('customize')",'grow'));
+  },
+
+  customize: function(){
+    return statusBar() + navBar('花艺定制') +
+    `<div class="body">
+      ${steps(['定制方式','尺寸','花材','数量','包装','丝带配件','服务费'],0)}
+      ${sec('① 选择定制方式')}
+      <div class="chiprow">${chip('全新定制',1)}${chip('在现成花束上改')}</div>
+      ${sec('② 选择花束尺寸')}
+      <div class="chiprow">${chip('S')}${chip('M',1)}${chip('L')}</div>
+      ${sec('③ 选择花材')}
+      <div class="chiprow">${chip('玫瑰',1)}${chip('郁金香')}${chip('洋桔梗')}${chip('绣球')}${chip('尤加利')}</div>
+      ${sec('④ 选择花材数量')}
+      <div class="chiprow">${chip('5支')}${chip('9支',1)}${chip('19支')}${chip('33支')}</div>
+      ${sec('⑤ 选择包装纸')}
+      <div class="chiprow">${chip('雾面银灰')}${chip('牛皮纸',1)}${chip('雪梨纸')}${chip('纱网')}</div>
+      ${sec('⑥ 选择丝带 / 配件')}
+      <div class="chiprow">${chip('香槟金丝带',1)}${chip('缎带')}${chip('贺卡')}</div>
+      ${sec('⑦ 花艺师服务费')}
+      <div class="links">
+        ${field('花艺师服务费（约定）','¥88')}
+        ${field('预估材料费（确认后付）','¥210–260')}
+      </div>
+    </div>` + actionbar(btn('下一步 · 提交需求',"go('customize-submit')",'grow'));
+  },
+
+  'customize-submit': function(){
+    return statusBar() + navBar('定制需求提交') +
+    `<div class="body">
+      ${steps(['定制方式','尺寸','花材','数量','包装','丝带配件','服务费'],6)}
+      ${sec('定制内容确认')}
+      <div class="links">
+        ${field('定制方式','全新定制')}
+        ${field('尺寸','M')}
+        ${field('花材','玫瑰 ×9、绣球 ×3、尤加利')}
+        ${field('包装','牛皮纸 + 香槟金丝带')}
+      </div>
+      ${sec('花艺师服务费确认')}
+      <div class="links">
+        ${field('花艺师服务费','¥88（本次支付）')}
+        ${field('材料费','3D 确认后支付')}
+      </div>
+      ${sec('备注与特殊需求')}
+      <div class="card muted">（填写备注，例如：请偏自然风、避免百合……）</div>
+      <div class="note">提交后需先支付花艺师服务费 ¥88；花艺师制作完成后你会看到 3D 预览，确认设计后再支付材料费。</div>
+    </div>` + actionbar(btn('提交制作申请',"go('pay')",'grow'));
+  },
+
+  /* ---------- 灵感 ---------- */
+  inspiration: function(){
+    return statusBar() + navBar('灵感', {back:false}) +
+    `<div class="body">
+      ${search('搜索灵感 / 专辑 / 色彩')}
+      <div class="banner" onclick="go('inspiration-detail')">
+        ${img('灵感推荐 · 编辑精选','r21',132)}
+        <div class="bn-ov"><b>把一张专辑，送成一束花</b><span>灵感详情 ›</span></div>
+      </div>
+      ${sec('热门主题')}
+      <div class="chiprow">${chip('复古蓝调')}${chip('自然野趣')}${chip('浪漫粉调')}${chip('极简白')}</div>
+      ${sec('四类灵感入口')}
+      <div class="grid2">
+        ${icard('专辑灵感','专辑','inspiration-album')}
+        ${icard('色彩灵感','色彩','inspiration-color')}
+        ${icard('风格灵感','风格','inspiration-style')}
+        ${icard('花艺作品','花艺','inspiration-works')}
+      </div>
+      ${sec('最新灵感')}
+      <div class="grid2">
+        ${icard('复古蓝调','色彩','inspiration-detail')}
+        ${icard('夏日海岸','专辑','inspiration-detail')}
+      </div>
+      <div class="note">专辑 / 色彩 / 风格 / 花艺作品是四种「探索入口」，最终都汇聚到同一个「灵感详情页」。</div>
+    </div>` + tabbar('inspiration');
+  },
+
+  'inspiration-album': function(){
+    return statusBar() + navBar('专辑灵感') +
+    `<div class="body">
+      ${sec('按专辑探索灵感')}
+      <div class="grid2">
+        ${icard('温柔纪事 · 某专辑','专辑','inspiration-detail')}
+        ${icard('夏日海岸 · 某专辑','专辑','inspiration-detail')}
+        ${icard('蓝调时刻 · 某专辑','专辑','inspiration-detail')}
+        ${icard('怦然心动 · 某专辑','专辑','inspiration-detail')}
+      </div>
+      ${sec('专辑灵感要素')}
+      <div class="links">
+        ${field('专辑封面 / 音乐风格 / 专辑色彩 / 专辑情绪','')}
+        ${field('专辑主题花束','Shop the look')}
+        ${field('专辑对应花材','可点击跳转购买')}
+      </div>
+    </div>` + tabbar('inspiration');
+  },
+
+  'inspiration-color': function(){
+    return statusBar() + navBar('色彩灵感') +
+    `<div class="body">
+      <div class="chiprow">${chip('单色系')}${chip('撞色搭配')}${chip('季节色彩')}${chip('情绪色彩')}</div>
+      ${sec('色彩搭配方案')}
+      <div class="card" style="display:flex;gap:12px;flex-wrap:wrap">${swatch('复古蓝','#93A3AE')}${swatch('银灰','#C9C2B6')}${swatch('暖白','#F2EDE4')}${swatch('陶土','#C79A7C')}${swatch('雾蓝','#93A3AE')}${swatch('干粉','#D4A9A2')}</div>
+      ${sec('灵感')}
+      <div class="grid2">
+        ${icard('复古蓝调','色彩','inspiration-detail')}
+        ${icard('浪漫粉调','色彩','inspiration-detail')}
+        ${icard('燕麦暖阳','色彩','inspiration-detail')}
+        ${icard('鼠尾草绿','色彩','inspiration-detail')}
+      </div>
+    </div>` + tabbar('inspiration');
+  },
+
+  'inspiration-style': function(){
+    return statusBar() + navBar('风格灵感') +
+    `<div class="body">
+      <div class="chiprow">${chip('复古风')}${chip('自然风')}${chip('浪漫风')}${chip('极简风')}${chip('个性混搭')}</div>
+      ${sec('灵感')}
+      <div class="grid2">
+        ${icard('复古 · Vintage','风格','inspiration-detail')}
+        ${icard('自然 · 野趣','风格','inspiration-detail')}
+        ${icard('浪漫 · 柔粉','风格','inspiration-detail')}
+        ${icard('极简 · 白绿','风格','inspiration-detail')}
+      </div>
+    </div>` + tabbar('inspiration');
+  },
+
+  'inspiration-works': function(){
+    return statusBar() + navBar('花艺作品') +
+    `<div class="body">
+      <div class="chiprow">${chip('花艺师作品')}${chip('主题花束')}${chip('包装设计')}${chip('创意花艺')}</div>
+      ${sec('作品')}
+      <div class="grid2">
+        ${icard('花艺师 · 仲夏','花艺','inspiration-detail')}
+        ${icard('主题 · 复古蓝调','花艺','inspiration-detail')}
+        ${icard('包装 · 雾面银灰','包装','inspiration-detail')}
+        ${icard('创意 · 几何结构','创意','inspiration-detail')}
+      </div>
+    </div>` + tabbar('inspiration');
+  },
+
+  'inspiration-detail': function(){
+    return statusBar() + navBar('灵感详情') +
+    `<div class="body">
+      ${img('灵感主视觉 · 复古蓝调','r45')}
+      <div class="h3" style="font-family:var(--serif);font-size:18px">复古蓝调 <span class="muted" style="font-weight:400">Vintage / Retro</span></div>
+      ${sec('灵感来源')}
+      <p class="muted">来自某张专辑的封面色调：复古蓝、银灰、暖白。</p>
+      ${sec('色彩解析')}
+      <div style="display:flex;gap:10px;flex-wrap:wrap">${swatch('复古蓝','#93A3AE')}${swatch('银灰','#C9C2B6')}${swatch('暖白','#F2EDE4')}</div>
+      ${sec('花材解析')}
+      <div class="chiprow">${chip('蓝绣球')}${chip('白玫瑰')}${chip('尤加利')}</div>
+      ${sec('包装搭配')}
+      <p class="muted">雾面银灰包装纸 + 香槟金丝带。</p>
+      ${sec('花艺设计说明')}
+      <p class="muted">以蓝调为主、银灰过渡，营造克制而优雅的复古氛围。</p>
+      ${sec('关联商品')}
+      <div class="grid2">
+        ${pcard('蓝调时刻','¥329','爱情','product-detail')}
+        ${pcard('温柔纪事','¥299','纪念日','product-detail')}
+      </div>
+      ${sec('相似灵感推荐')}
+      <div class="grid2">
+        ${icard('夏日海岸','专辑','inspiration-detail')}
+        ${icard('浪漫粉调','色彩','inspiration-detail')}
+      </div>
+    </div>` + actionbar(btn('将这份灵感转化为花束',"go('inspiration-convert')",'grow'));
+  },
+
+  'inspiration-convert': function(){
+    return statusBar() + navBar('灵感转化') +
+    `<div class="body">
+      ${sec('① 选择关联花束')}
+      <div class="links">
+        ${link('蓝调时刻 · 成品花束','¥329',"go('product-detail')")}
+        ${link('温柔纪事 · 成品花束','¥299',"go('product-detail')")}
+      </div>
+      ${sec('② 或 选择对应花材')}
+      <div class="chiprow">${chip('蓝绣球',1)}${chip('白玫瑰',1)}${chip('尤加利',1)}${chip('银灰包装')}</div>
+      ${sec('③ 使用灵感搭配方案')}
+      <div class="card muted">色彩：复古蓝 / 银灰 / 暖白 · 花材：蓝绣球、白玫瑰 · 包装：雾面银灰</div>
+      ${sec('④ 进入花艺定制')}
+      <div class="note">以这套视觉方案为参考，自主选花材并提交花艺师制作。</div>
+    </div>` + actionbar(btn('进入花艺定制',"go('customize')",'grow'));
+  },
+
+  /* ---------- 购物车 ---------- */
+  cart: function(){
+    return statusBar() + navBar('购物车', {back:false}) +
+    `<div class="body">
+      ${sec('普通商品')}
+      <div class="links">
+        ${field('温柔纪事（M）×1','¥299')}
+        ${field('单支 · 玫瑰 ×3','¥45')}
+      </div>
+      ${sec('定制商品')}
+      <div class="links">
+        ${field('定制 · 复古蓝调','服务费 ¥88 · 待制作')}
+        ${field('定制花材清单','蓝绣球/白玫瑰/尤加利')}
+      </div>
+      ${sec('价格汇总')}
+      <div class="links">
+        ${field('普通商品小计','¥344')}
+        ${field('定制 · 服务费','¥88（待支付）')}
+        ${field('优惠','−¥20')}
+        ${field('合计','¥412')}
+      </div>
+      <div class="note">普通商品与定制商品分组计价：普通商品直接结算；定制商品先付服务费，3D 确认后再付材料费。</div>
+    </div>` + actionbar(btn('去结算',"go('checkout')",'grow')) + tabbar('cart');
+  },
+
+  checkout: function(){
+    return statusBar() + navBar('结算') +
+    `<div class="body">
+      ${sec('配送时间')}
+      <div class="chiprow">${chip('今天')}${chip('明天',1)}${chip('时段：上午')}${chip('时段：下午')}</div>
+      ${sec('订单备注')}
+      <div class="card muted">（贺卡留言 / 配送备注）</div>
+      ${sec('费用明细')}
+      <div class="links">
+        ${field('商品小计','¥344')}
+        ${field('优惠券','−¥20')}
+        ${field('配送费','¥0')}
+        ${field('合计','¥324')}
+      </div>
+      ${sec('优惠券')}
+      <div class="links">${link('选择优惠券','已选 −¥20',"")}</div>
+    </div>` + actionbar(btn('提交订单',"go('pay')",'grow'));
+  },
+
+  pay: function(){
+    return statusBar() + navBar('支付') +
+    `<div class="body">
+      <div class="suc" style="padding:20px 20px">
+        <span style="font-family:var(--serif);font-size:22px">¥324</span>
+        <span class="muted">待支付金额</span>
+      </div>
+      ${sec('支付方式')}
+      <div class="links">
+        ${link('微信支付','','')}
+        ${link('银行卡','','')}
+      </div>
+      <div class="note">原型阶段为「模拟支付」，不产生真实扣款。</div>
+    </div>` + actionbar(btn('确认支付',"go('pay-success')",'grow'));
+  },
+
+  'pay-success': function(){
+    return statusBar() + navBar('支付成功', {back:false}) +
+    `<div class="body">
+      <div class="suc">
+        <span class="ck">✓</span>
+        <b>支付成功</b>
+        <span>我们已收到你的订单，将尽快为你安排。</span>
+      </div>
+    </div>` + actionbar(btn('查看订单',"go('orders')",'grow'));
+  },
+
+  /* ---------- 我的 ---------- */
+  profile: function(){
+    return statusBar() + navBar('我的', {back:false}) +
+    `<div class="body">
+      <div class="card" style="display:flex;align-items:center;gap:12px">
+        <span class="sc-ic" style="width:56px;height:56px"></span>
+        <div><div style="font-weight:600">花小语</div><div class="muted">昵称 · 点击编辑资料</div></div>
+      </div>
+      ${sec('我的订单')}
+      <div class="links">
+        ${link('全部订单','',"go('orders')")}
+        ${link('待付款 / 待制作 / 待预览确认 / 待配送 / 已完成 / 售后','',"go('orders')")}
+      </div>
+      ${sec('我的定制')}
+      <div class="links">${link('定制申请 · 制作进度 · 3D 预览 · 确认设计','',"go('my-customize')")}</div>
+      ${sec('我的灵感')}
+      <div class="links">${link('收藏的灵感 / 专辑 / 色彩方案 / 花艺作品','',"go('my-inspiration')")}</div>
+      ${sec('我的商品')}
+      <div class="links">${link('商品收藏 / 浏览记录','',"go('my-products')")}</div>
+      ${sec('地址与支付')}
+      <div class="links">${link('收货地址 · 发票信息 · 支付记录','',"go('address')")}</div>
+      ${sec('客户服务')}
+      <div class="links">${link('在线客服 · 定制咨询 · 退款售后 · 常见问题','',"go('service')")}</div>
+      ${sec('设置')}
+      <div class="links">${link('账号管理 · 隐私设置 · 消息通知','',"go('settings')")}</div>
+    </div>` + tabbar('profile');
+  },
+
+  orders: function(){
+    return statusBar() + navBar('我的订单') +
+    `<div class="body">
+      <div class="chiprow">${chip('全部',1)}${chip('待付款')}${chip('待制作')}${chip('待预览确认')}${chip('待配送')}${chip('已完成')}${chip('售后')}</div>
+      ${sec('订单列表')}
+      <div class="links">
+        ${link('订单 · 温柔纪事','待配送 ¥299',"go('order-detail')")}
+        ${link('订单 · 蓝调时刻','待付款 ¥329',"go('order-detail')")}
+        ${link('订单 · 晨雾花园','已完成 ¥359',"go('order-detail')")}
+      </div>
+    </div>` + tabbar('profile');
+  },
+
+  'order-detail': function(){
+    return statusBar() + navBar('订单详情') +
+    `<div class="body">
+      <div class="card">
+        <div style="font-weight:600;margin-bottom:6px">订单状态</div>
+        <div class="muted">已下单 → 待付款 → 待配送 → 已完成</div>
+      </div>
+      ${sec('商品')}
+      <div class="links">
+        ${field('温柔纪事（M）×1','¥299')}
+        ${field('配送费','¥0')}
+        ${field('实付','¥299')}
+      </div>
+      ${sec('配送信息')}
+      <div class="links">
+        ${field('收礼人','张同学 · 138****0000')}
+        ${field('送达时间','明天 · 下午')}
+      </div>
+    </div>` + actionbar(obtn('联系客服',"go('service')",'grow') + btn('再来一单',"go('shop')",'grow'));
+  },
+
+  'my-customize': function(){
+    return statusBar() + navBar('我的定制') +
+    `<div class="body">
+      ${sec('定制申请')}
+      <div class="links">
+        ${link('定制 · 复古蓝调','待预览确认',"go('preview3d')")}
+        ${link('定制 · 自然野趣','制作中',"go('preview3d')")}
+        ${link('定制 · 极简白绿','已确认 · 待尾款',"go('preview3d')")}
+      </div>
+      ${sec('流程')}
+      <div class="card">
+        ${steps(['提交需求','支付服务费','花艺师制作','3D预览','确认设计','支付尾款'],3)}
+      </div>
+      <div class="note">用户需要清楚知道：花艺师是否接单、是否制作完成、是否等待自己确认。</div>
+    </div>` + tabbar('profile');
+  },
+
+  preview3d: function(){
+    return statusBar() + navBar('3D 预览与确认') +
+    `<div class="body">
+      ${img('3D 花束预览（占位）','r169',180)}
+      <div class="h3">定制 · 复古蓝调</div>
+      ${sec('预览说明')}
+      <p class="muted">花艺师已按你的需求完成制作，请旋转查看效果；如需调整可发起「修改/调整」。</p>
+      ${sec('费用确认')}
+      <div class="links">
+        ${field('花艺师服务费','¥88（已支付）')}
+        ${field('材料费（本次支付）','¥236')}
+      </div>
+    </div>` + actionbar(obtn('修改 / 调整',"go('customize')",'grow') + btn('确认设计',"go('pay')",'grow'));
+  },
+
+  'my-inspiration': function(){
+    return statusBar() + navBar('我的灵感') +
+    `<div class="body">
+      <div class="chiprow">${chip('灵感')}${chip('专辑')}${chip('色彩方案')}${chip('花艺作品')}</div>
+      ${sec('收藏')}
+      <div class="grid2">
+        ${icard('复古蓝调','色彩','inspiration-detail')}
+        ${icard('夏日海岸','专辑','inspiration-detail')}
+        ${icard('自然 · 野趣','风格','inspiration-detail')}
+        ${icard('花艺师 · 仲夏','花艺','inspiration-detail')}
+      </div>
+    </div>` + tabbar('profile');
+  },
+
+  'my-products': function(){
+    return statusBar() + navBar('我的商品') +
+    `<div class="body">
+      <div class="chiprow">${chip('商品收藏')}${chip('浏览记录')}</div>
+      ${sec('商品收藏')}
+      <div class="grid2">
+        ${pcard('温柔纪事','¥299','纪念日','product-detail')}
+        ${pcard('蓝调时刻','¥329','爱情','product-detail')}
+      </div>
+      ${sec('浏览记录')}
+      <div class="links">
+        ${link('晨雾花园','¥359',"go('product-detail')")}
+        ${link('暖阳','¥259',"go('product-detail')")}
+      </div>
+    </div>` + tabbar('profile');
+  },
+
+  address: function(){
+    return statusBar() + navBar('地址与支付') +
+    `<div class="body">
+      ${sec('收货地址')}
+      <div class="links">
+        ${link('张同学 · 138****0000','某某市某某区…','')}
+        ${link('+ 新增地址','','')}
+      </div>
+      ${sec('发票信息')}
+      <div class="links">${link('个人 / 企业发票','','')}</div>
+      ${sec('支付记录')}
+      <div class="links">
+        ${link('¥324 · 微信支付','2026-11-08','')}
+        ${link('¥88 · 定制服务费','2026-11-07','')}
+      </div>
+    </div>` + tabbar('profile');
+  },
+
+  service: function(){
+    return statusBar() + navBar('客户服务') +
+    `<div class="body">
+      <div class="links">
+        ${link('在线客服','','')}
+        ${link('定制咨询','','')}
+        ${link('退款 / 售后','','')}
+        ${link('常见问题','','')}
+      </div>
+    </div>` + tabbar('profile');
+  },
+
+  settings: function(){
+    return statusBar() + navBar('设置') +
+    `<div class="body">
+      <div class="links">
+        ${link('账号管理','','')}
+        ${link('隐私设置','','')}
+        ${link('消息通知','','')}
+      </div>
+    </div>` + tabbar('profile');
+  },
+
+  /* ---------- 其他 ---------- */
+  'scene-list': function(){
+    return statusBar() + navBar('场景选花 · 生日祝福') +
+    `<div class="body">
+      <div class="chiprow">${chip('综合排序',1)}${chip('价格')}${chip('花材')}</div>
+      <div class="grid2" style="margin-top:12px">
+        ${pcard('晨雾花园','¥359','生日','product-detail')}
+        ${pcard('温柔纪事','¥299','纪念日','product-detail')}
+        ${pcard('暖阳','¥259','日常','product-detail')}
+        ${pcard('怦然心动','¥199','爱情','product-detail')}
+      </div>
+    </div>` + tabbar('shop');
+  },
+
+  topic: function(){
+    return statusBar() + navBar('主题专题') +
+    `<div class="body">
+      ${topicCard('本月花色研究所',"go('topic')")}
+      ${topicCard('季节花专题 · 夏日限定',"go('topic')")}
+      ${topicCard('节日限定专题',"go('topic')")}
+      ${topicCard('主题视觉企划',"go('topic')")}
+    </div>` + actionbar(btn('进入选花',"go('shop')",'grow'));
+  },
+
+  brand: function(){
+    return statusBar() + navBar('品牌与服务') +
+    `<div class="body">
+      ${img('品牌理念 · 主视觉','r21',120)}
+      <div class="links" style="margin-top:12px">
+        ${link('品牌理念','','')}
+        ${link('花艺师介绍','','')}
+        ${link('定制服务介绍','','')}
+        ${link('服务流程','','')}
+      </div>
+    </div>` + actionbar(btn('去选花',"go('shop')",'grow'));
+  }
+};
+
+/* ================= 导航 ================= */
+var stack = ['home'];
+var TAB_ROOT = {home:'home', shop:'shop', inspiration:'inspiration', cart:'cart', profile:'profile'};
+
+function go(id){
+  if(!SCREENS[id]) return;
+  stack.push(id);
+  render();
+}
+function back(){
+  if(stack.length > 1){ stack.pop(); render(); }
+}
+function tab(t){
+  stack = [TAB_ROOT[t] || 'home'];
+  render();
+}
+function toggleMap(){
+  var s = document.getElementById('sidebar');
+  s.classList.toggle('open');
+}
+
+/* ================= 站点地图 ================= */
+var SITEMAP = [
+  {t:'首页 Home', items:[['home','1 首页']]},
+  {t:'选花 Shop', items:[['shop','2.1 选花首页'],['shop-list','2.4 商品列表'],['product-detail','2.5 商品详情'],['customize','2.6 花艺定制'],['customize-submit','2.7 定制需求提交']]},
+  {t:'灵感 Inspiration', items:[['inspiration','3.1 灵感首页'],['inspiration-album','3.2 专辑灵感'],['inspiration-color','3.3 色彩灵感'],['inspiration-style','3.4 风格灵感'],['inspiration-works','3.5 花艺作品'],['inspiration-detail','3.6 灵感详情'],['inspiration-convert','3.7 灵感转化']]},
+  {t:'购物车 Cart', items:[['cart','4 购物车'],['checkout','4.5 结算'],['pay','支付'],['pay-success','支付成功']]},
+  {t:'我的 Profile', items:[['profile','5 我的'],['orders','5.2 我的订单'],['order-detail','订单详情'],['my-customize','5.3 我的定制'],['preview3d','3D 预览与确认'],['my-inspiration','5.4 我的灵感'],['my-products','5.5 我的商品'],['address','5.6 地址与支付'],['service','5.7 客户服务'],['settings','5.8 设置']]},
+  {t:'其他', items:[['scene-list','场景选花列表'],['topic','1.5 主题专题'],['brand','1.6 品牌与服务']]}
+];
+
+function renderSitemap(){
+  var html = '';
+  SITEMAP.forEach(function(g){
+    html += '<div class="sm-group"><div class="sm-gt">' + g.t + '</div>';
+    g.items.forEach(function(it){
+      html += '<button class="sm-item" data-id="' + it[0] + '" onclick="go(\'' + it[0] + '\')">' + it[1] + '</button>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('sitemap').innerHTML = html;
+}
+
+/* ================= 渲染 ================= */
+function render(){
+  var id = stack[stack.length - 1];
+  var el = document.getElementById('screen');
+  el.innerHTML = SCREENS[id]();
+  el.scrollTop = 0;
+  document.querySelectorAll('.sm-item').forEach(function(n){
+    n.classList.toggle('cur', n.dataset.id === id);
+  });
+  var cur = document.querySelector('.sm-item.cur');
+  if(cur && cur.scrollIntoView){ cur.scrollIntoView({block:'nearest'}); }
+}
+
+renderSitemap();
+render();
+</script>
+</body>
+</html>
